@@ -1,103 +1,237 @@
-import Image from "next/image";
+'use client';
+
+import { useRef, useState } from 'react';
+import emailjs from '@emailjs/browser';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import PricingCard from '@/components/PricingCard';
+import FAQItem from '@/components/FAQItem';
+import TestimonialCarousel from '@/components/TestimonialCarousel';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const form = useRef<HTMLFormElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const sendEmail = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.current) return;
+
+    emailjs
+      .sendForm(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_4zx5uu4',
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'template_axs1hyo',
+        form.current,
+        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'UtO8oIrLceQwxTBUr'
+      )
+      .then(
+        () => {
+          alert('Message sent successfully!');
+          form.current?.reset();
+        },
+        (error) => {
+          alert('Failed to send message: ' + (error.text || error.message || 'Unknown error'));
+        }
+      );
+  };
+
+  const features = [
+    { icon: '📊', title: 'AI Analytics', desc: 'Track and optimize campaigns with AI.' },
+    { icon: '⚙️', title: 'Automation', desc: 'Automate media planning easily.' },
+    { icon: '🧠', title: 'Smart Insights', desc: 'Get AI-powered insights on performance.' },
+    { icon: '📅', title: 'Scheduler', desc: 'Schedule campaigns with precision.' },
+    { icon: '💬', title: 'Chatbot', desc: 'Integrate AI chatbots into your campaigns.' },
+    { icon: '📈', title: 'Live Dashboard', desc: 'View metrics in real-time dashboards.' },
+  ];
+
+  return (
+    <main className="min-h-screen flex flex-col bg-white text-center scroll-smooth">
+      {/* Navbar */}
+      <nav className="w-full sticky top-0 bg-white/40 backdrop-blur-lg z-50 flex justify-between items-center px-6 py-4 shadow-md">
+        <div className="text-xl font-extrabold text-blue-600">ADmyBRAND</div>
+
+        <div className="md:hidden">
+          <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle Menu">
+            {menuOpen ? (
+              <XMarkIcon className="w-6 h-6 text-gray-800" />
+            ) : (
+              <Bars3Icon className="w-6 h-6 text-gray-800" />
+            )}
+          </button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        <ul className="hidden md:flex gap-6 text-gray-700 text-sm font-medium">
+          <li><a href="#">Home</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+
+        {menuOpen && (
+          <ul className="absolute top-[70px] left-0 w-full bg-white flex flex-col gap-4 items-center py-4 shadow-md md:hidden">
+            <li><a href="#" onClick={() => setMenuOpen(false)}>Home</a></li>
+            <li><a href="#features" onClick={() => setMenuOpen(false)}>Features</a></li>
+            <li><a href="#pricing" onClick={() => setMenuOpen(false)}>Pricing</a></li>
+            <li><a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a></li>
+          </ul>
+        )}
+      </nav>
+
+      {/* Hero Section */}
+      <section className="flex flex-col items-center justify-center px-6 py-20">
+        <motion.div
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
         >
           <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+            src="/hero.jpg"
+            alt="Hero"
+            width={1200}
+            height={700}
+            className="w-full max-w-[1200px] h-auto rounded-2xl shadow-lg"
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        </motion.div>
+
+        <motion.h1
+          className="text-4xl md:text-6xl font-bold mt-6 text-black"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          Welcome to ADmyBRAND AI Suite
+        </motion.h1>
+
+        <motion.p
+          className="text-lg mt-4 max-w-2xl text-gray-700"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
         >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
+          Empower your marketing campaigns with automation, analytics, and AI-driven insights.
+        </motion.p>
+
+        <motion.a
+          href="#features"
+          className="mt-6 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition cursor-pointer"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.7, duration: 0.5 }}
+        >
+          Get Started
+        </motion.a>
+      </section>
+
+      {/* Features Section */}
+      <motion.section
+        id="features"
+        className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-4"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        transition={{ staggerChildren: 0.2 }}
+      >
+        {features.map((feature, idx) => (
+          <motion.div
+            key={idx}
+            className="bg-white/30 backdrop-blur-md p-6 rounded-2xl border border-gray-200 shadow hover:shadow-lg transition"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: idx * 0.2 }}
+          >
+            <div className="text-4xl">{feature.icon}</div>
+            <h3 className="text-xl text-black font-semibold mt-4">{feature.title}</h3>
+            <p className="text-gray-600 mt-2">{feature.desc}</p>
+          </motion.div>
+        ))}
+      </motion.section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="mt-24 px-6 py-16 bg-white text-center">
+        <h2 className="text-3xl font-bold text-gray-900 mb-12">Choose Your Plan</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <PricingCard
+            title="Starter"
+            price="$29/mo"
+            features={['Basic Analytics', 'Email Support', 'Campaign Scheduler']}
           />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          <PricingCard
+            title="Professional"
+            price="$79/mo"
+            popular
+            features={['Advanced Analytics', 'Chatbot', 'Priority Support', 'All Starter Features']}
+          />
+          <PricingCard
+            title="Enterprise"
+            price="Custom"
+            features={['All Pro Features', 'Dedicated Manager', 'Custom Integrations']}
+          />
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="mt-28 px-6 py-20 bg-gray-100">
+        <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">What Our Clients Say</h2>
+        <TestimonialCarousel />
+      </section>
+
+      {/* FAQ Section */}
+      <section className="mt-24 px-6 py-20 bg-white">
+        <h2 className="text-3xl font-bold text-center text-gray-900 mb-10">FAQs</h2>
+        <div className="grid gap-6 max-w-3xl mx-auto">
+          <FAQItem
+            question="What is ADmyBRAND AI Suite?"
+            answer="It's an AI-powered marketing platform for campaign automation and optimization."
+          />
+          <FAQItem
+            question="Can I try it for free?"
+            answer="Yes! We offer a free trial with basic features."
+          />
+          <FAQItem
+            question="Is my data secure?"
+            answer="Absolutely. We use end-to-end encryption and follow industry best practices."
+          />
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="mt-28 w-full px-4 py-16 bg-gray-50">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Contact Us</h2>
+          <p className="text-gray-600 mb-8">
+            Have questions or want a demo? Reach out and we’ll get back to you soon.
+          </p>
+          <form ref={form} onSubmit={sendEmail} className="space-y-6">
+            <input
+              name="user_name"
+              type="text"
+              placeholder="Your Name"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 placeholder-gray-400"
+              required
+            />
+            <input
+              name="user_email"
+              type="email"
+              placeholder="Your Email"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 placeholder-gray-400"
+              required
+            />
+            <textarea
+              name="message"
+              placeholder="Your Message"
+              rows={4}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 placeholder-gray-400"
+              required
+            ></textarea>
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition text-gray-800 placeholder-gray-400"
+            >
+              Send Message
+            </button>
+          </form>
+        </div>
+      </section>
+    </main>
   );
 }
